@@ -4,6 +4,7 @@ cellSize = 20
 
 function love.load()
     loadImages()
+    placeMines()
 end
 
 function love.update(dt)
@@ -13,6 +14,12 @@ end
 function love.draw()
     drawTIles(gridSizeX, gridSizeY)
     drawMousePos()
+end
+
+function love.mousereleased(mouseX, mouseY, button)
+    if button == 2 then
+        toggleMine(x, y)
+    end
 end
 
 function loadImages()
@@ -38,7 +45,27 @@ function drawTIles(gridX, gridY)
             else
                 image = images.covered
             end
-            love.graphics.draw(image, (x - 1) * cellSize, (y - 1) * cellSize)
+            
+            drawCell(image, x, y)
+
+            local surroundingMineCount = 0
+
+            for dx = -1, 1 do
+                for dy = -1, 1 do
+                    if not (dx == 0 and dy == 0) and
+                        grid[x + dx] and grid[x + dx][y + dy] and
+                        grid[x + dx][y + dy].mine then
+                        surroundingMineCount = surroundingMineCount + 1
+                    end
+                end
+            end
+            
+            if grid[x][y].mine then
+                drawCell(images.mine, x, y)
+            elseif surroundingMineCount > 0 then
+                drawCell(images[surroundingMineCount], x, y)
+            end
+
         end
     end
 end
@@ -60,4 +87,24 @@ function drawMousePos()
     love.graphics.setColor(0, 0, 0)
     love.graphics.print("Selected x: " .. selectedX .. ", Selected y: " .. selectedY)
     love.graphics.setColor(255, 255, 255)
+end
+
+function drawCell(image, x, y)
+    love.graphics.draw(image, (x - 1) * cellSize, (y - 1) * cellSize)    
+end
+
+function placeMines()
+    grid = {}
+    for x = 1, gridSizeX do
+        grid[x] = {}
+        for y = 1, gridSizeY do
+            grid[x][y] = {
+                mine = false
+            }
+        end
+    end
+end
+
+function toggleMine(x, y)
+    grid[selectedX][selectedY].mine = not grid[selectedX][selectedY].mine
 end

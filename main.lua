@@ -1,6 +1,7 @@
 gridSizeX = 40
 gridSizeY = 30
 cellSize = 20
+numberOfMines = 120
 
 function love.load()
     loadImages()
@@ -20,6 +21,10 @@ function love.mousereleased(mouseX, mouseY, button)
     if button == 2 then
         toggleMine(x, y)
     end
+end
+
+function love.keypressed()
+    love.load()
 end
 
 function loadImages()
@@ -95,14 +100,24 @@ end
 
 function placeMines()
     grid = {}
+    local possibleMineLocations = {}
+
     for x = 1, gridSizeX do
         grid[x] = {}
         for y = 1, gridSizeY do
+            table.insert(possibleMineLocations, { x = x, y = y })
+
             grid[x][y] = {
                 mine = false
             }
         end
     end
+
+    for mineIndex = 1, numberOfMines do
+        local position = table.remove(possibleMineLocations, love.math.random(#possibleMineLocations))
+        grid[position.x][position.y].mine = true
+    end
+
 end
 
 function toggleMine(x, y)

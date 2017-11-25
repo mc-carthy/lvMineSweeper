@@ -33,17 +33,19 @@ function love.mousereleased(mouseX, mouseY, button)
 
             grid[x][y].state = 'uncovered'
 
-            for dx = -1, 1 do
-                for dy = -1, 1 do
-                    if not (x == 0 and y == 0)
-                        and grid[x + dx]
-                        and grid[x + dx][y + dy]
-                        and grid[x + dx][y + dy].state == 'covered' 
-                    then
-                        table.insert(stack, {
-                            x = x + dx,
-                            y = y + dy
-                        })
+            if getSurroundingMineCount(x, y) == 0 then
+                for dx = -1, 1 do
+                    for dy = -1, 1 do
+                        if not (x == 0 and y == 0)
+                            and grid[x + dx]
+                            and grid[x + dx][y + dy]
+                            and grid[x + dx][y + dy].state == 'covered' 
+                        then
+                            table.insert(stack, {
+                                x = x + dx,
+                                y = y + dy
+                            })
+                        end
                     end
                 end
             end
@@ -85,17 +87,7 @@ function drawTIles(gridX, gridY)
             
             drawCell(image, x, y)
 
-            local surroundingMineCount = 0
-
-            for dx = -1, 1 do
-                for dy = -1, 1 do
-                    if not (dx == 0 and dy == 0) and
-                        grid[x + dx] and grid[x + dx][y + dy] and
-                        grid[x + dx][y + dy].mine then
-                        surroundingMineCount = surroundingMineCount + 1
-                    end
-                end
-            end
+            surroundingMineCount = getSurroundingMineCount(x, y)
             
             if grid[x][y].mine then
                 drawCell(images.mine, x, y)
@@ -155,4 +147,22 @@ end
 
 function toggleMine(x, y)
     grid[selectedX][selectedY].mine = not grid[selectedX][selectedY].mine
+end
+
+function getSurroundingMineCount(x, y)
+    local surroundingMineCount = 0
+    
+    for dx = -1, 1 do
+        for dy = -1, 1 do
+            if not (dx == 0 and dy == 0) and
+                grid[x + dx] and 
+                grid[x + dx][y + dy] and
+                grid[x + dx][y + dy].mine 
+            then
+                surroundingMineCount = surroundingMineCount + 1
+            end
+        end
+    end
+
+    return surroundingMineCount
 end

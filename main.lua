@@ -1,12 +1,13 @@
 gridSizeX = 40
 gridSizeY = 30
 cellSize = 20
-numberOfMines = 120
+numberOfMines = 250
+gameOver = false
+firstClick = true
 
 function love.load()
-    gameOver = false
     loadImages()
-    placeMines()
+    createGrid()
 end
 
 function love.update(dt)
@@ -22,6 +23,11 @@ end
 function love.mousereleased(mouseX, mouseY, button)
     if not gameOver then
         if button == 1 and grid[selectedX][selectedY].state ~= 'flag' then
+            if firstClick then
+                firstClick = false
+                placeMines()
+            end
+                
             if grid[selectedX][selectedY].mine then
                 grid[selectedX][selectedY].state = 'uncovered'
                 gameOver = true
@@ -76,6 +82,8 @@ function love.mousereleased(mouseX, mouseY, button)
                 end
             end
         end
+    else
+        love.load()
     end
 
     if button == 2 then
@@ -110,7 +118,7 @@ function drawTiles(gridX, gridY)
             if grid[x][y].state == 'uncovered' then
                 image = images.uncovered
             else
-                if x == selectedX and y == selectedY then
+                if x == selectedX and y == selectedY and not gameOver then
                     if love.mouse.isDown(1) then
                         if grid[x][y].state == 'flag' then
                             image = images.covered
@@ -130,9 +138,9 @@ function drawTiles(gridX, gridY)
             
             surroundingMineCount = getSurroundingMineCount(x, y)
             
-            if grid[x][y].mine then
+            if grid[x][y].mine and gameOver then
                 drawCell(images.mine, x, y)
-            elseif surroundingMineCount > 0 then
+            elseif surroundingMineCount > 0 and grid[x][y].state == 'uncovered' then
                 drawCell(images[surroundingMineCount], x, y)
             end
 
@@ -179,19 +187,26 @@ function drawCell(image, x, y)
     love.graphics.draw(image, (x - 1) * cellSize, (y - 1) * cellSize)    
 end
 
-function placeMines()
+function createGrid()
     grid = {}
-    local possibleMineLocations = {}
-
     for x = 1, gridSizeX do
         grid[x] = {}
         for y = 1, gridSizeY do
-            table.insert(possibleMineLocations, { x = x, y = y })
-
             grid[x][y] = {
                 mine = false,
                 state = 'covered'
             }
+        end
+    end
+end
+
+function placeMines()
+    local possibleMineLocations = {}
+    for x = 1, gridSizeX do
+        for y = 1, gridSizeY do
+            if not (x == selectedX and y == selectedY) then
+                table.insert(possibleMineLocations, { x = x, y = y })
+            end
         end
     end
 

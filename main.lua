@@ -51,10 +51,20 @@ function love.mousereleased(mouseX, mouseY, button)
             end
         end
     end
+
+    if button == 2 then
+        if grid[selectedX][selectedY].state == 'covered' then
+            grid[selectedX][selectedY].state = 'flag'
+        elseif grid[selectedX][selectedY].state == 'flag' then
+            grid[selectedX][selectedY].state = 'question'
+        elseif grid[selectedX][selectedY].state == 'question' then
+            grid[selectedX][selectedY].state = 'covered'
+        end
+    end
 end
 
 function love.keypressed()
-    love.load()
+    -- love.load()
 end
 
 function loadImages()
@@ -84,9 +94,10 @@ function drawTIles(gridX, gridY)
                     image = images.covered
                 end
             end
+
             
             drawCell(image, x, y)
-
+            
             surroundingMineCount = getSurroundingMineCount(x, y)
             
             if grid[x][y].mine then
@@ -95,6 +106,12 @@ function drawTIles(gridX, gridY)
                 drawCell(images[surroundingMineCount], x, y)
             end
 
+            if grid[x][y].state == 'flag' then
+                drawCell(images.flag, x, y)
+            elseif grid[x][y].state == 'question' then
+                drawCell(images.question, x, y)
+            end
+            
         end
     end
 end

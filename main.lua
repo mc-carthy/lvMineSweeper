@@ -18,6 +18,10 @@ function love.draw()
 end
 
 function love.mousereleased(mouseX, mouseY, button)
+    if button == 1 then
+        grid[selectedX][selectedY].state = 'uncovered'
+    end
+    
     if button == 2 then
         toggleMine(x, y)
     end
@@ -41,14 +45,18 @@ function drawTIles(gridX, gridY)
         for y = 1, gridY do
             local image
 
-            if x == selectedX and y == selectedY then
-                if love.mouse.isDown(1) then
-                    image = images.uncovered
-                else
-                    image = images.coveredHighlighted
-                end
+            if grid[x][y].state == 'uncovered' then
+                image = images.uncovered
             else
-                image = images.covered
+                if x == selectedX and y == selectedY then
+                    if love.mouse.isDown(1) then
+                        image = images.uncovered
+                    else
+                        image = images.coveredHighlighted
+                    end
+                else
+                    image = images.covered
+                end
             end
             
             drawCell(image, x, y)
@@ -108,7 +116,8 @@ function placeMines()
             table.insert(possibleMineLocations, { x = x, y = y })
 
             grid[x][y] = {
-                mine = false
+                mine = false,
+                state = 'covered'
             }
         end
     end

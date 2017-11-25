@@ -18,7 +18,7 @@ function love.draw()
 end
 
 function love.mousereleased(mouseX, mouseY, button)
-    if button == 1 then
+    if button == 1 and grid[selectedX][selectedY].state ~= 'flag' then
         local stack = {
             {
                 x = selectedX,
@@ -39,7 +39,10 @@ function love.mousereleased(mouseX, mouseY, button)
                         if not (x == 0 and y == 0)
                             and grid[x + dx]
                             and grid[x + dx][y + dy]
-                            and grid[x + dx][y + dy].state == 'covered' 
+                            and (
+                                grid[x + dx][y + dy].state == 'covered' or
+                                grid[x + dx][y + dy].state == 'question'
+                            )
                         then
                             table.insert(stack, {
                                 x = x + dx,
@@ -86,7 +89,11 @@ function drawTIles(gridX, gridY)
             else
                 if x == selectedX and y == selectedY then
                     if love.mouse.isDown(1) then
-                        image = images.uncovered
+                        if grid[x][y].state == 'flag' then
+                            image = images.covered
+                        else
+                            image = images.uncovered
+                        end
                     else
                         image = images.coveredHighlighted
                     end

@@ -4,6 +4,7 @@ cellSize = 20
 numberOfMines = 120
 
 function love.load()
+    gameOver = false
     loadImages()
     placeMines()
 end
@@ -18,36 +19,43 @@ function love.draw()
 end
 
 function love.mousereleased(mouseX, mouseY, button)
-    if button == 1 and grid[selectedX][selectedY].state ~= 'flag' then
-        local stack = {
-            {
-                x = selectedX,
-                y = selectedY
-            }
-        }
-
-        while #stack > 0 do
-            local current = table.remove(stack)
-            local x = current.x
-            local y = current.y
-
-            grid[x][y].state = 'uncovered'
-
-            if getSurroundingMineCount(x, y) == 0 then
-                for dx = -1, 1 do
-                    for dy = -1, 1 do
-                        if not (x == 0 and y == 0)
-                            and grid[x + dx]
-                            and grid[x + dx][y + dy]
-                            and (
-                                grid[x + dx][y + dy].state == 'covered' or
-                                grid[x + dx][y + dy].state == 'question'
-                            )
-                        then
-                            table.insert(stack, {
-                                x = x + dx,
-                                y = y + dy
-                            })
+    if not gameOver then
+        if button == 1 and grid[selectedX][selectedY].state ~= 'flag' then
+            if grid[selectedX][selectedY].mine then
+                grid[selectedX][selectedY].state = 'uncovered'
+                gameOver = true
+            else
+                local stack = {
+                    {
+                        x = selectedX,
+                        y = selectedY
+                    }
+                }
+        
+                while #stack > 0 do
+                    local current = table.remove(stack)
+                    local x = current.x
+                    local y = current.y
+        
+                    grid[x][y].state = 'uncovered'
+        
+                    if getSurroundingMineCount(x, y) == 0 then
+                        for dx = -1, 1 do
+                            for dy = -1, 1 do
+                                if not (x == 0 and y == 0)
+                                    and grid[x + dx]
+                                    and grid[x + dx][y + dy]
+                                    and (
+                                        grid[x + dx][y + dy].state == 'covered' or
+                                        grid[x + dx][y + dy].state == 'question'
+                                    )
+                                then
+                                    table.insert(stack, {
+                                        x = x + dx,
+                                        y = y + dy
+                                    })
+                                end
+                            end
                         end
                     end
                 end

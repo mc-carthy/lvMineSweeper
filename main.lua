@@ -19,11 +19,35 @@ end
 
 function love.mousereleased(mouseX, mouseY, button)
     if button == 1 then
-        grid[selectedX][selectedY].state = 'uncovered'
-    end
-    
-    if button == 2 then
-        toggleMine(x, y)
+        local stack = {
+            {
+                x = selectedX,
+                y = selectedY
+            }
+        }
+
+        while #stack > 0 do
+            local current = table.remove(stack)
+            local x = current.x
+            local y = current.y
+
+            grid[x][y].state = 'uncovered'
+
+            for dx = -1, 1 do
+                for dy = -1, 1 do
+                    if not (x == 0 and y == 0)
+                        and grid[x + dx]
+                        and grid[x + dx][y + dy]
+                        and grid[x + dx][y + dy].state == 'covered' 
+                    then
+                        table.insert(stack, {
+                            x = x + dx,
+                            y = y + dy
+                        })
+                    end
+                end
+            end
+        end
     end
 end
 

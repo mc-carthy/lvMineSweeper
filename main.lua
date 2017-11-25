@@ -14,8 +14,9 @@ function love.update(dt)
 end
 
 function love.draw()
-    drawTIles(gridSizeX, gridSizeY)
+    drawTiles(gridSizeX, gridSizeY)
     drawMousePos()
+    drawGameOver()
 end
 
 function love.mousereleased(mouseX, mouseY, button)
@@ -59,6 +60,20 @@ function love.mousereleased(mouseX, mouseY, button)
                         end
                     end
                 end
+
+                local complete = true
+
+                for x = 1, gridSizeX do
+                    for y = 1, gridSizeY do
+                        if grid[x][y].state ~= 'uncovered' and not grid[x][y].mine then
+                            complete = false
+                        end
+                    end
+                end
+
+                if complete then
+                    gameOver = true
+                end
             end
         end
     end
@@ -87,7 +102,7 @@ function loadImages()
     end
 end
 
-function drawTIles(gridX, gridY)
+function drawTiles(gridX, gridY)
     for x = 1, gridX do
         for y = 1, gridY do
             local image
@@ -147,6 +162,16 @@ end
 function drawMousePos()
     love.graphics.setColor(0, 0, 0)
     love.graphics.print("Selected x: " .. selectedX .. ", Selected y: " .. selectedY)
+    love.graphics.setColor(255, 255, 255)
+end
+
+function drawGameOver()
+    love.graphics.setColor(0, 0, 0)
+    if gameOver then
+        love.graphics.print('Game Over!', 0, 30)
+    else
+        love.graphics.print('Play Game!', 0, 30)
+    end
     love.graphics.setColor(255, 255, 255)
 end
 

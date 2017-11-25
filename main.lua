@@ -7,7 +7,7 @@ firstClick = true
 
 function love.load()
     loadImages()
-    createGrid()
+    reset()
 end
 
 function love.update(dt)
@@ -16,8 +16,8 @@ end
 
 function love.draw()
     drawTiles(gridSizeX, gridSizeY)
-    drawMousePos()
-    drawGameOver()
+    -- drawMousePos()
+    -- drawGameOver()
 end
 
 function love.mousereleased(mouseX, mouseY, button)
@@ -95,10 +95,6 @@ function love.mousereleased(mouseX, mouseY, button)
             grid[selectedX][selectedY].state = 'covered'
         end
     end
-end
-
-function love.keypressed()
-    -- love.load()
 end
 
 function loadImages()
@@ -187,7 +183,7 @@ function drawCell(image, x, y)
     love.graphics.draw(image, (x - 1) * cellSize, (y - 1) * cellSize)    
 end
 
-function createGrid()
+function reset()
     grid = {}
     for x = 1, gridSizeX do
         grid[x] = {}
@@ -198,6 +194,9 @@ function createGrid()
             }
         end
     end
+
+    gameOver = false
+    firstClick = true
 end
 
 function placeMines()
